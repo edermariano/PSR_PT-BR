@@ -1,7 +1,9 @@
-Padrão básico de codificação
+Padrão de Codificação Básico
 =====================
 
-Esta seção do padrão compreende o que deve ser considerado dos elementos padrões de codificação que são necessários para um alto nível de interoperabilidade técnica entre código PHP compartilhado.
+Esta seção do padrão compreende o que deve ser considerado dos elementos codificação padrão que são necessários para garantir um alto nível de interoperabilidade técnica entre código PHP compartilhado.
+
+As palavras-chave "DEVE", "NÃO DEVE", "REQUERIDO", "DEVERIA", "NÃO DEVERIA", "RECOMENDADO", "PODE" e "OPCIONAL" nesse documento devem ser interpretadas como descrito na [RFC 2119](http://www.ietf.org/rfc/rfc2119.txt).
 
 [PSR-0]: https://github.com/enricopereira/PSR_PT-BR/blob/master/PSR-0.md
 
@@ -9,19 +11,19 @@ Esta seção do padrão compreende o que deve ser considerado dos elementos padr
 1. Visão geral
 -----------
 
-- Arquivos devem usar apenas as tags `<?php` e `<?=`.
+- Arquivos DEVEM usar apenas tags `<?php` e `<?=`.
 
-- Arquivos devem usar apenas UTF-8 sem BOM para código PHP.
+- Arquivos DEVEM usar apenas UTF-8 sem BOM para código PHP.
 
-- Arquvos devem declarar símbolos (classes, funções, contantes, etc.) ou causar outros efeitos (ex: gerar output, alterar configurações .ini, etc.), mas não devem fazer as duas coisas.
+- Arquivos DEVERIAM _ou_ declarar símbolos (classes, funções, contantes, etc.) _ou_ causar outros efeitos (ex: gerar output, alterar configurações .ini, etc.), mas NÃO DEVERIAM fazer as duas coisas.
 
-- Namespaces e classes devem seguir a [PSR-0][].
+- Namespaces e classes DEVEM seguir a [PSR-0][].
 
-- Nomes das classes devem ser declarados em `StudlyCaps`.
+- Nomes de classe DEVEM ser declarados em `StudlyCaps`.
 
-- Constantes de classes devem ser declaradas em letra maiúscula separado por underlines.
+- Constantes de classes DEVEM ser declaradas todas em letra maiúscula ("upper case") com separadores underline.
 
-- Nomes de métodos devem ser declarados em `camelCase`.
+- Nomes de métodos DEVEM ser declarados em `camelCase`.
 
 
 2. Arquivos
@@ -29,25 +31,22 @@ Esta seção do padrão compreende o que deve ser considerado dos elementos padr
 
 ### 2.1. Tags PHP
 
-Código PHP deve usar as tags longas `<?php ?>` ou a short-tags para echo `<?= ?>`; não deve se utilizar outras tags.
+Código PHP DEVE usar as tags longas `<?php ?>` ou as short-echo tags `<?= ?>`; NÃO DEVE se utilizar outras variantes de tag.
 
-### 2.2. Codificação de caracteres
+### 2.2. Codificação de Caracteres
 
-Código PHP deve usar apenas UTF-8 sem BOM.
+Código PHP DEVE usar apenas UTF-8 sem BOM.
 
 ### 2.3. Efeitos secundários
 
+Um arquivo DEVERIA declarar novos símbolos (classes, funções, contantes, etc.) e não causar outros efeitos colaterais ou ele DEVERIA executar lógica com efeitos secundários, mas NÃO DEVERIA fazer ambos.
 
-Um arquivo deve declarar novos símbolos (classes, funções, contantes, etc.) e não causar outros efeitos, ou ele deve executar lógica com outros efeitos, mas não deve fazer ambos.
+A expressão "efeitos secundários" significa a execução da lógica não diretamente ligada com declaração de classes, funções, constantes, etc, _meramente pela inclusão do arquivo_.
 
-A expressão "efeitos secundários" significa a execução da lógica não diretamente ligada com
-declaração de classes, funções, constantes, etc, apenas de incluir o arquivo.
+"Efeitos secundários" incluem, mas não estão limitados a: geração de output, uso explícito de `require` ou `include`, conexão a serviços externos, modificação de configurações ini, emissão de erros ou exceções, modificação de variáveis ​​globais ou estáticas,
+ler ou escrever em um arquivo e assim por diante.
 
-"Efeitos secundários" incluem, mas não estão limitados a: A geração do output, uso explícito de `require` ou `include`, conexão a serviços externos, modificação de configurações ini, emissão erros ou exceções, modificação das variáveis ​​globais ou estáticas,
-ler ou escrever em um arquivo, e assim por diante.
-
-A seguir está um exemplo de um arquivo, com as declarações e efeitos secundários;
-um exemplo de que deve ser evitado:
+A seguir está um exemplo de um arquivo com ambos, declarações e efeitos secundários; um exemplo de que deve ser evitado:
 
 ```php
 <?php
@@ -67,7 +66,7 @@ function foo()
 }
 ```
 
-A seguir está um exemplo de um arquivo, com declarações sem efeitos secundários; um exemplo do que deve ser feito:
+O exemplo a seguir é de um arquivo que contém declarações sem efeitos secundários; um exemplo do que deve ser feito:
 
 ```php
 <?php
@@ -77,7 +76,7 @@ function foo()
     // corpo da função
 }
 
-// declaração condicional não é um efeito secundário
+// declaração condicional *não é* um efeito secundário
 if (! function_exists('bar')) {
     function bar()
     {
@@ -87,16 +86,16 @@ if (! function_exists('bar')) {
 ```
 
 
-3. Namespace e nomes de classes
+3. Namespace e Nomes de Classe
 ----------------------------
 
-Namespaces e classes devem seguir a [PSR-0][].
+Namespaces e classes DEVEM seguir a [PSR-0][].
 
-Isto significa que cada classe está em um arquivo, por si mesmo, e é em um espaço de pelo menos um nível: um nível superior com o nome do fornecedor.
+Isso significa que cada classe está em um arquivo, por si mesmo, e é em uma namespace de, pelo menos, um nível: um nome de fornecedor de nível superior.
 
-Classes devem ser declaradas em `StudlyCaps`.
+Nomes de classe DEVEM ser declaradas em `StudlyCaps`.
 
-Código escrito para PHP 5.3 ou superior deve utilizar namespaces reais.
+Código escrito para PHP 5.3 e superior DEVE utilizar namespaces formal.
 
 Por exemplo:
 
@@ -110,7 +109,7 @@ class Foo
 }
 ```
 
-Código escrito para PHP 5.2.x ou inferior deve utilizar a convenção pseudo-namespace do `Vendor_` prefixando nos nomes das classes.
+Código escrito para 5.2.x e inferior DEVERIA utilizar a convenção de pseudo-namespace de prefixos `Vendor_` em nomes de classe.
 
 ```php
 <?php
@@ -120,14 +119,14 @@ class Vendor_Model_Foo
 }
 ```
 
-4. Constantes de classes, propriedades e métodos
+4. Constantes de Classe, Propriedades e Métodos
 -------------------------------------------
 
-O termo "classes" se refere a todas as classes, interfaces e traits.
+O termo "classe" se refere a todas as classes, interfaces e traits.
 
 ### 4.1. Constantes
 
-Constantes de classes devem ser declaradas em letra maiúscula separado por underlines.
+Constantes de classe DEVEM ser todas declaradas em letra maiúscula ("upper case") com separados underline.
 Por exemplo:
 
 ```php
@@ -143,12 +142,10 @@ class Foo
 
 ### 4.2. Propriedades
 
-Este guia intencionalmente evita qualquer recomendação sobre o uso de
-`$StudlyCaps`, `$camelCase`, ou `$under_score` em nomes de propriedades.
+Este guia intencionalmente evita qualquer recomendação sobre o uso de `$StudlyCaps`, `$camelCase` ou `$under_score` em nomes de propriedades.
 
-Seja qual for convenção de nomenclatura usada, ela deve ser aplicada de forma consistente dentro de um
-escopo razoável. Esse escopo pode ser a nível de fornecedor, pacote, classe ou método.
+Seja qual for a convenção de nomenclatura usada, ela DEVERIA ser aplicada consistentemente dentro de um escopo razoável. Esse escopo pode ser a nível de fornecedor, nível de pacote, nível de classe ou nível de método.
 
 ### 4.3. Métodos
 
-Métodos devem ser declarados em `camelCase()`.
+Nomes de método DEVEM ser declarados em `camelCase()`.

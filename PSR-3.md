@@ -3,82 +3,80 @@ Logger Interface
 
 Este documento descreve uma interface comum para bibliotecas de log.
 
-O objetivo principal é permitir bibliotecas para receber um objeto `Psr\Log\LoggerInterface` e escrever logs para ele em uma forma simples e universal. Frameworks e CMSs que tem necessidades próprias podem estender a interface para sua própria proposta, mas deve manter a compatibilidade com este documetno. Isto assegura que as bibliotecas de terceiros que uma aplicação usa pode escrever para os logs centralizados da aplicação.
+O objetivo principal é permitir bibliotecas a receber um objeto `Psr\Log\LoggerInterface` e escrever logs para ele em uma forma simples e universal. Frameworks e CMSs que têm necessidades próprias PODEM estender a interface para sua própria proposta, mas DEVERIAM manter a compatibilidade com este documento. Isso assegura que bibliotecas de terceiros que uma aplicação usa podem escrever nos logs da aplicação centralizada.
 
-A palavra `implementadir` neste documento é para ser interpretada como alguém que implementa a `LoggerInterface` em uma biblioteca ou framework relacionado a log.
+As palavras-chave "DEVE", "NÃO DEVE", "REQUERIDO", "DEVERIA", "NÃO DEVERIA", "RECOMENDADO", "PODE" e "OPCIONAL" nesse documento devem ser interpretadas como descrito na [RFC 2119](http://www.ietf.org/rfc/rfc2119.txt).
+
+A palavra `implementor` neste documento é para ser interpretada como alguém implementando a `LoggerInterface` numa biblioteca ou framework relacionado a log. Usuários dos sismteas de logs ("loggers") são referidos como `user`.
 
 1. Especificação
 -----------------
 
 ### 1.1 Básico
 
-- A `LoggerInterface` expõe oito métodos par escrever logs para oito níveis (debug, info, notice, warning, error, critical, alert,
-  emergency) como descrito na [RFC 5424][].
+- A `LoggerInterface` expõe oito métodos par escrever logs para os oito níveis [RFC 5424][] (debug, info, notice, warning, error, critical, alert, emergency).
 
-- Um nono método (`log`), aceita um nível de log como primeiro argumento. Chamando este método com uma das constantes dos níveis de log deve ter o mesmo resultado como chamando o método específico do nível. Chamando este método com um nível não definido por esta especificação deve lançar uma `Psr\Log\InvalidArgumentException` se a implementação não conhece o nível. Usuários não devem usar um nível customizado sem saber ao certo se a implementação atual suporta ele.
+- Um nono método, `log`, aceita um nível de log como primeiro argumento. Chamando este método com uma das constantes dos níveis de log DEVE ter o mesmo resultado como chamando o método específico do nível. Chamando este método com um nível não definido por esta especificação DEVE lançar uma `Psr\Log\InvalidArgumentException` se a implementação não conhece o nível. Usuários NÃO DEVEM usar um nível customizado sem saber ao certo se a implementação atual o irá suportar.
 
 [RFC 5424]: http://tools.ietf.org/html/rfc5424
 
 ### 1.2 Mensagem
 
-- Todo método aceita uma string como a mensagem, ou um objeto com um método `__toString()`. Implementadores podem ter um tratamento especial para os objetos passados. Se esse não foro caso, implementadores devem moldar ele para uma string.
+- Todo método aceita uma string como a mensagem ou um objeto com um método `__toString()`. Implementadores PODEM ter um tratamento especial para os objetos passados. Se esse não for o caso, implementadores DEVEM fazer conversão para string.
 
-- A mensagem pode conter placeholders que implementadores podem substituir com valores do array de contexto.
+- A mensagem PODE conter placeholders que implementadores PODEM substituir com valores do array de contexto.
 
-  Nomes de placeholders devem corresponder para chaves no array de contexto.
+  Nomes de placeholders DEVEM corresponder a chaves no array de contexto.
 
-  Nomes  de placeholders devem ser delimitados com uma única abertura de chaves `{` e um único fechamento de chaves `}`. Não deve ter nenhum espaço em branco entre o delimitador e o nome do placeholder.
+  Nomes de placeholders DEVEM ser delimitados com uma única chave de abertura `{` e uma única chave de fechamento `}`. NÃO DEVE haver nenhum espaço em branco entre o delimitador e o nome do placeholder.
 
-  Nomes de placeholders devem ser compostos apenas de caracteres `A-Z`, `a-z`,
-  `0-9`, underscore `_`, e ponto `.`. O uso de outros caracteres é resevado para futuras modificações da especificação dos placeholders.
+  Nomes de placeholders DEVERIAM ser compostos apenas de caracteres `A-Z`, `a-z`, `0-9`, underline `_` e ponto `.`. O uso de outros caracteres é reservado para futuras modificações da especificação dos placeholders.
 
-  Implementadores podem usar placeholders para implementar várias estratégias de escapamento e traduzir logs para exibir. Usuários não devem pré-escapar os valores do placeholder desde que eles não podem saber em qual contexto de dado serão exibidos.
+  Implementadores PODEM usar placeholders para implementar várias estratégias de escapamento ("escaping") e traduzir logs para exibir. Usuários NÃO DEVEM pré-escapar ("pre-escape") valores de placeholder, já que eles não podem saber em qual contexto os dados serão exibidos.
 
-  O seguinte é um exemplo de uma implementação de inserção de placeholder fornecida para propósitos de referência apenas.
+  O seguinte é um exemplo de uma implementação de interpolação de placeholder fornecida para propósitos de referência apenas:
 
   ```php
   /**
-   * Insere contexto de valores dentro dos placeholders na mensagem.
+   * Interpola valores de contexto nos placeholders de mensagem
    */
   function interpolate($message, array $context = array())
   {
-      // cria uma substituição de array com chaves em torno das chaves de contexto
+      // cria um array de substituição com chaves em torno das chaves de contexto
       $replace = array();
       foreach ($context as $key => $val) {
           $replace['{' . $key . '}'] = $val;
       }
 
-      // insere uma substituição de valores dentro da mensagem e retorna
+      // interpola valores de substituição na mensagem e retorna
       return strtr($message, $replace);
   }
 
-  // uma mensagem com delimitação de chaves nos nomes dos placeholders
+  // uma mensagem com nomes de placeholders com delimitação de chaves ("brace-delimited")
   $message = "User {username} created";
 
-  // um contexto de array dos nomes de placeholders => valores de substituição
-  // a context array of placeholder names => va
+  // um array de contexto de nomes de placeholders => valores de substituição
   $context = array('username' => 'bolivar');
 
-  // imprime "Username bolivar created"
+  // mostra "Username bolivar created"
   echo interpolate($message, $context);
   ```
 
 ### 1.3 Contexto
 
-- Cada método aceita um array como dados de contexto. Isto se destina a manter qualquer informação irrelevante que não se encaixam bem em uma string. O array pode conter qualquer coisa. Implementadores devem garantir que eles tratem dados de contexto. Um valor dado no contexto não deve lançar uma exception nem qualquer erro php, waring ou notice.
+- Cada método aceita um array como dado de contexto. Isto se destina a manter qualquer informação irrelevante que não se encaixa bem em uma string. O array pode conter qualquer coisa. Implementadores devem garantir que eles tratam dados de contexto com indulgência, tanto quanto possível. Um dado valor no contexto NÃO DEVE lançar uma exception nem qualquer php error, warning ou notice.
 
-- Se um objeto `Exception` for passado em um dado de contexto, ele deve ser na palavra-chave `'exception'`. Exceções de log é um padrão comum e isto permite implementadores extrairem um stack trace da exceção quando o log backend suporte ele. Implementadores devem ainda verificar que a palavra-chave `'exception'` é realmente uma `Exception` antes de usá-la como tal, pois ela pode conter qualquer coisa.
+- Se um objeto `Exception` é passado no contexto de dados, ele DEVE ser na chave `'exception'`. Exceções de log é um padrão comum e isso permite implementadores extrairem um stack trace da exceção quando o log backend o suporte. Implementadores DEVEM, ainda, verificar que a chave `'exception'` é realmente uma `Exception` antes de usá-la como tal, pois ela PODE conter qualquer coisa.
 
 ### 1.4 Classes helper e interfaces
 
-- A classe `Psr\Log\AbstractLogger` permite você implementar a `LoggerInterface` muito facilmente estendendo ela e implementando o método genérico `log`. Os outros oito métodos são o encaminhamento da mensagem e contexto para isso.
+- A classe `Psr\Log\AbstractLogger` permite que você implemente `LoggerInterface` muito facilmente a estendendo e implementando o método genérico `log`. Os outros oito métodos são o encaminhamento da mensagem e contexto para isso.
 
-- Similarmente, usando a `Psr\Log\LoggerTrait` apenas requer que você implemente o método genérico `log`. Note que uma vez que traits não podem implementar interfaces, neste caso você ainda tem que implementar `LoggerInterface`.
+- Similarmente, usando a `Psr\Log\LoggerTrait` apenas requer que você implemente o método genérico `log`. Note que uma vez que traits não podem implementar interfaces, neste caso você ainda tem que usar `implement LoggerInterface`.
 
-- O `Psr\Log\NullLogger` é fornecido junto com a interface. Ela pode ser usado por usuários da interface para fornecer uma implementação fall-back "black hole" se nenhum logger lhes é dado. No entanto log condicional
-pode ser uma melhor abordagem, se a criação de dados de contexto é custoso.
+- A `Psr\Log\NullLogger` é fornecido junto com a interface. Ela PODE ser usada por usuários da interface para fornecer um fall-back "black hole" se nenhum logger lhes é dado. No entanto, log condicional pode ser uma melhor abordagem se a criação de dados de contexto é custosa.
 
-- O `Psr\Log\LoggerAwareInterface` apenas contém um método `setLogger(LoggerInterface $logger)` e pode ser usada pelos frameworks para criar instâncias automáticas com um logger.
+- A `Psr\Log\LoggerAwareInterface` apenas contém um método `setLogger(LoggerInterface $logger)` e pode ser usada por frameworks para criar instâncias arbitrárias com um logger.
 
 - A trait `Psr\Log\LoggerAwareTrait` pode ser usada para implementar a interface equivalente facilmente em qualquer classe. Ela dá acesso para `$this->logger`.
 
@@ -87,7 +85,7 @@ pode ser uma melhor abordagem, se a criação de dados de contexto é custoso.
 2. Pacote
 ----------
 
-As interfaces e classes descritas bem como as classes de exceptions e uma suíte de testes para verificar se sua implementação é fornecida como parte do pacote [psr/log](https://packagist.org/packages/psr/log).
+As interfaces e classes descritas, bem como classes de exceptions relevantes e uma suíte de testes para verificar sua implementação, é fornecida como parte do pacote [psr/log](https://packagist.org/packages/psr/log).
 
 3. `Psr\Log\LoggerInterface`
 ----------------------------
@@ -98,18 +96,19 @@ As interfaces e classes descritas bem como as classes de exceptions e uma suíte
 namespace Psr\Log;
 
 /**
- * Descreve a instância do logger
+ * Descreve um exemplo de logger
  *
- * A mensagem deve ser uma string ou um objeto implementando __toString().
+ * A mensagem DEVE ser uma string ou um objeto implementando __toString().
  *
- * A mensagem pode conter placeholders na forma: {foo} onde foo será substituido pelo dado de contexto na chave "foo".
+ * A mensagem PODE conter placeholders na forma: {foo} onde foo será substituido
+ * pelo dado de contexto na chave "foo".
  *
- * O array de contexto pode conter dados específicos, a única hipótese que
- * pode ser feita pelos implementadores é que se uma instância de Exception é dada
- * para produzir um stack trace, ele deve estar em uma chave chamada "exceção".
+ * O array de contexto pode conter dados arbitrários, a única suposição que pode
+ * ser feita pelos implementadores é que se uma instância de Exception é dada
+ * para produzir um stack trace, ele DEVE estar em uma chave chamada "exception".
  *
  * Veja https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
- * para a especificação completa da interface
+ * para a especificação completa da interface.
  */
 interface LoggerInterface
 {
@@ -126,8 +125,8 @@ interface LoggerInterface
      *
      * Ação deve ser tomada imediatamente.
      *
-     * Exemplo: website fora do ar, banco de dados inacessível, etc. Isto deveria
-     * adcionar os alertas de SMS e acordar você.
+     * Exemplo: Website inteiro fora do ar, banco de dados inacessível, etc. 
+     * Isso deveria disparar os alertas de SMS e acordar você.
      *
      * @param string $message
      * @param array $context
@@ -138,7 +137,7 @@ interface LoggerInterface
     /**
      * Condições críticas.
      *
-     * Exemplo: componente da aplicação não disponível, exception inesperada.
+     * Exemplo: Componente da aplicação não disponível, exception inesperada.
      *
      * @param string $message
      * @param array $context
@@ -147,8 +146,8 @@ interface LoggerInterface
     public function critical($message, array $context = array());
 
     /**
-     * Erros em tempo de execução que Não requer ação imediara mas deveria tipicamente
-     * ser gravada em log e monitorada.
+     * Erros em tempo de execução que não requerem ação imediata, mas, normalmente,
+     * deveriam ser gravados em log ("logged") e monitorados.
      *
      * @param string $message
      * @param array $context
@@ -159,7 +158,8 @@ interface LoggerInterface
     /**
      * Ocorrências excepcionais que não são erros.
      *
-     * Exemplo: uso de APIs obsoletas, mau uso de uma API, coisas indesejáveis que não são necessariamente erradas.
+     * Exemplo: Uso de APIs obsoletas, mau uso de uma API, coisas indesejáveis 
+     * que não são necessariamente erradas.
      *
      * @param string $message
      * @param array $context
@@ -179,7 +179,7 @@ interface LoggerInterface
     /**
      * Eventos interessantes.
      *
-     * Exemplo: Logins de usuários, logs SQL.
+     * Exemplo: Usuários loga, SQL cria log.
      *
      * @param string $message
      * @param array $context
@@ -197,7 +197,7 @@ interface LoggerInterface
     public function debug($message, array $context = array());
 
     /**
-     * Logs com um nível específico.
+     * Logs com um nível arbitrário.
      *
      * @param mixed $level
      * @param string $message
@@ -240,7 +240,7 @@ interface LoggerAwareInterface
 namespace Psr\Log;
 
 /**
- * Descreve os níveis de log
+ * Descreve níveis de log
  */
 class LogLevel
 {

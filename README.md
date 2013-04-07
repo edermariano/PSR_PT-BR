@@ -12,3 +12,5 @@ PSR-0: [clique aqui](https://github.com/php-fig/fig-standards/blob/master/accept
 PSR-1: [clique aqui](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md)
 
 PSR-2: [clique aqui](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md)
+
+PSR-3: [clique aqui](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md)

@@ -3,14 +3,14 @@ A seguir, o manual com os requisitos obrigatórios que devem ser seguidos para a
 Obrigatório
 ---------
 
-* Uma namespace totalmente qualificada e as classes devem seguir a seguinte estrutura `\<Nome do Fabricante>\(<Namespace>\)*<Nome da Classe>`
-* Cada namespace deve ter uma namespace de nível superior ("Nome do fabricante").
+* Uma namespace totalmente qualificada e as classes devem seguir a seguinte estrutura `\<Nome de Fornecedor>\(<Namespace>\)*<Nome da Classe>`
+* Cada namespace deve ter uma namespace de nível superior ("Nome de Fornecedor").
 * Cada namespace pode ter quantos sub-namespaces que quiser.
-* Cada separador de namespace deve ser convertido para `DIRECTORY_SEPARATOR` durante o carregamento do sistema de arquivos.
+* Cada separador de namespace é convertido para `DIRECTORY_SEPARATOR` durante o carregamento do sistema de arquivos.
 * Cada caractere `_` no nome da classe é convertido para
   `DIRECTORY_SEPARATOR`. O caractere `_`não tem nenhum significado especial na namespace.
 * A namespace totalmente qualificada e a classe é sufixada com `.php` durante o carregamento do sistema de arquivos.
-* Caracteres alfabéticos em nomes de fabricante, em namespaces e em classes podem ser qualquer combinação de letras maiúsculas e minúsculas.
+* Caracteres alfabéticos em nomes de fornecedor, namespaces e nomes de classe podem ser de qualquer combinação de letras maiúsculas ("upper case") e minúsculas ("lower case").
 
 Exemplos
 --------
@@ -20,19 +20,18 @@ Exemplos
 * `\Zend\Acl` => `/caminho/para/projeto/lib/vendor/Zend/Acl.php`
 * `\Zend\Mail\Message` => `/caminho/para/projeto/lib/vendor/Zend/Mail/Message.php`
 
-Underlines em namespaces e em nomes de classes
+Underscores em Namespaces e Nomes de Classe
 -----------------------------------------
 
 * `\namespace\package\Class_Name` => `/caminho/para/projeto/lib/vendor/namespace/package/Class/Name.php`
 * `\namespace\package_name\Class_Name` => `/caminho/para/projeto/lib/vendor/namespace/package_name/Class/Name.php`
 
-Os padrões que definimos aqui devem ser o menor denominador comum para
-uma indolor interoperabilidade de autocarregamento. Você pode testar se está seguindo esses padrões, utilizando esta amostra da implementação da SplClassLoader que é capaz de carregar classes do PHP 5.3.
+Os padrões que definimos aqui devem ser o menor denominador comum para uma indolor interoperabilidade de autocarregamento. Você pode testar se está seguindo esses padrões utilizando esta amostra da implementação da SplClassLoader que é capaz de carregar classes do PHP 5.3.
 
-Exemplo de implementação
+Implementação Exemplo
 ----------------------
 
-Abaixo está um exemplo de função para simplesmente demonstrar como os padrões propostos acima são autocarregados.
+Abaixo está uma função de exemplo para simplesmente demonstrar como os padrões propostos acima são autocarregados.
 ```php
 <?php
 
@@ -55,7 +54,7 @@ function autoload($className)
 Implementação da SplClassLoader
 -----------------------------
 
-O seguinte gist é uma implementação da SplClassLoader que carrega suas classes se você seguir as propostas de interoperabilidade de autocarregamento citadas acima. Atualmente, é a forma recomendada para carregar classes de PHP 5.3 que seguem estes padrões.
+O seguinte gist é um exemplo de implementação da SplClassLoader que pode carregar suas classes se você seguir as propostas de interoperabilidade de autocarregamento citadas acima. Essa é a forma recomendada atual para carregar classes de PHP 5.3 que seguem estes padrões.
 
 * [http://gist.github.com/221634](http://gist.github.com/221634)
 
